@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moteur de recherche de livres</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #resultats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .livre-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .livre-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .livre-card h3 {
+            margin: 10px 0;
+        }
+        .livre-card p {
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 Moteur de recherche de livres</h1>
+    <form id="recherche-form">
+        <input type="text" id="terme-recherche" placeholder="Rechercher par titre, auteur..." required>
+        <button type="submit">Rechercher</button>
+    </form>
+    <div id="resultats">
+        </div>
+</div>
+
+<script>
+    document.getElementById('recherche-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const terme = document.getElementById('terme-recherche').value;
+        const resultatsDiv = document.getElementById('resultats');
+        resultatsDiv.innerHTML = 'Chargement...';
+
+        try {
+            const reponse = await fetch(`/rechercher_livres?q=${encodeURIComponent(terme)}`);
+            const livres = await reponse.json();
+
+            resultatsDiv.innerHTML = '';
+            if (livres.length === 0) {
+                resultatsDiv.innerHTML = '<p>Aucun livre trouvé.</p>';
+            } else {
+                livres.forEach(livre => {
+                    const card = document.createElement('div');
+                    card.className = 'livre-card';
+                    card.innerHTML = `
+                        <img src="${livre.image}" alt="Couverture de ${livre.titre}">
+                        <h3>${livre.titre}</h3>
+                        <p><strong>Auteur(s) :</strong> ${livre.auteurs}</p>
+                        <p><strong>Année :</strong> ${livre.annee}</p>
+                    `;
+                    resultatsDiv.appendChild(card);
+                });
+            }
+        } catch (erreur) {
+            resultatsDiv.innerHTML = '<p>Une erreur est survenue lors de la recherche.</p>';
+            console.error('Erreur:', erreur);
+        }
+    });
+</script>
+
+</body>
+</html>
