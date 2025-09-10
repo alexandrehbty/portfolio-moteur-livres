@@ -13,7 +13,7 @@ def rechercher_livres():
     if not terme_recherche:
         return jsonify({'erreur': 'Veuillez fournir un terme de recherche.'}), 400
 
-    api_url = f"https://www.googleapis.com/books/v1/volumes?q={terme_recherche}"
+    api_url = f"https://www.googleapis.com/books/v1/volumes?q={terme_recherche}&langRestrict=fr"
 
     try:
         reponse = requests.get(api_url)
